@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ThemeProvider } from '@/components/theme/theme-provider'
+import { Navigation } from '@/components/dashboard/navigation'
+import { ErrorBoundary } from '@/components/dashboard/error-boundary'
 
 export const metadata: Metadata = {
   title: 'Claude Scope - Monitoring Dashboard',
@@ -12,11 +15,23 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className="h-full bg-gray-50 font-sans">
-        <div className="min-h-full">
-          {children}
-        </div>
+    <html lang="en" className="h-full" suppressHydrationWarning>
+      <body className="h-full bg-background font-sans antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="min-h-full">
+            <Navigation />
+            <main className="min-h-screen bg-background">
+              <ErrorBoundary>
+                {children}
+              </ErrorBoundary>
+            </main>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )

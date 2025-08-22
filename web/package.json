@@ -20,6 +20,9 @@
     "date-fns": "^4.1.0",
     "class-variance-authority": "^0.7.1",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-tooltip": "^1.0.7",
+    "next-themes": "^0.2.1",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {

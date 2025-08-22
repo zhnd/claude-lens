@@ -2,68 +2,76 @@
 
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MetricCard } from "./metric-card"
-import { MetricsChart } from "./metrics-chart"
-import { ToolUsageChart } from "./tool-usage-chart"
-import { SessionsTable } from "./sessions-table"
-import { RefreshControls } from "./refresh-controls"
-import { useMetricsPolling } from "@/hooks/use-metrics"
-import { formatDuration, formatNumber } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { TimeRangeSelector } from "./time-range-selector"
+import { 
+  KPICard,
+  TokenTrendChart,
+  ToolUsagePie,
+  UsageHeatmap,
+  CostProgressRing
+} from "@/components/charts"
+import { 
+  useDashboardKPIs,
+  useTokenTrend,
+  useToolUsage,
+  useUsageHeatmap,
+  useBudgetProgress
+} from "@/hooks/use-analytics"
 import { 
   Activity, 
-  Users, 
-  Terminal, 
-  Clock,
+  DollarSign, 
+  Code2,
+  Users,
   AlertTriangle,
-  TrendingUp,
-  Database,
-  Cpu
+  RefreshCw,
+  BarChart3
 } from 'lucide-react'
+import Link from 'next/link'
 
 export function Dashboard() {
-  const [autoRefresh, setAutoRefresh] = useState(true)
-  const {
-    overview,
-    timeline,
-    sessions,
-    loading,
-    error,
-    lastUpdated,
-    refresh,
-    isPolling,
-    startPolling,
-    stopPolling,
-  } = useMetricsPolling(autoRefresh, 30000) // 30 seconds interval
+  const [timeRange, setTimeRange] = useState('24h')
+  
+  // Fetch all dashboard data with the selected time range
+  const kpis = useDashboardKPIs({ range: timeRange })
+  const tokenTrend = useTokenTrend({ range: timeRange })
+  const toolUsage = useToolUsage({ range: timeRange })
+  const heatmap = useUsageHeatmap({ range: timeRange })
+  const budgetProgress = useBudgetProgress()
 
-  const handleTogglePolling = () => {
-    if (isPolling) {
-      stopPolling()
-      setAutoRefresh(false)
-    } else {
-      startPolling()
-      setAutoRefresh(true)
-    }
+  const handleRefreshAll = () => {
+    kpis.refetch()
+    tokenTrend.refetch()
+    toolUsage.refetch()
+    heatmap.refetch()
+    budgetProgress.refetch()
   }
 
-  if (error) {
+  const hasError = kpis.error || tokenTrend.error || toolUsage.error || heatmap.error || budgetProgress.error
+  const isLoading = kpis.loading || tokenTrend.loading || toolUsage.loading || heatmap.loading || budgetProgress.loading
+
+  if (hasError) {
     return (
       <div className="container mx-auto p-6">
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-destructive/50 bg-destructive/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
+            <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
               Error Loading Dashboard
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-red-600 mb-4">{error}</p>
-            <RefreshControls
-              isPolling={isPolling}
-              lastUpdated={lastUpdated}
-              onManualRefresh={refresh}
-              onTogglePolling={handleTogglePolling}
-              loading={loading}
-            />
+            <div className="space-y-2 text-sm">
+              {kpis.error && <p>KPIs: {kpis.error}</p>}
+              {tokenTrend.error && <p>Token Trend: {tokenTrend.error}</p>}
+              {toolUsage.error && <p>Tool Usage: {toolUsage.error}</p>}
+              {heatmap.error && <p>Usage Heatmap: {heatmap.error}</p>}
+              {budgetProgress.error && <p>Budget Progress: {budgetProgress.error}</p>}
+            </div>
+            <Button onClick={handleRefreshAll} className="mt-4" size="sm">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -73,153 +81,126 @@ export function Dashboard() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Claude Scope Dashboard</h1>
+          <h1 className="text-3xl font-bold">Personal Analytics Dashboard</h1>
           <p className="text-muted-foreground">
-            Monitoring Claude Code sessions and tool usage
+            Monitor your Claude Code usage, costs, and productivity
           </p>
         </div>
-        <RefreshControls
-          isPolling={isPolling}
-          lastUpdated={lastUpdated}
-          onManualRefresh={refresh}
-          onTogglePolling={handleTogglePolling}
-          loading={loading}
-        />
-      </div>
-
-      {/* Metrics Overview Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Total Sessions"
-          value={overview?.total_sessions ?? 0}
-          description="All recorded sessions"
-          icon={Users}
-          status="default"
-        />
-        <MetricCard
-          title="Active Sessions"
-          value={overview?.active_sessions ?? 0}
-          description="Currently running"
-          icon={Activity}
-          status={overview?.active_sessions ? 'success' : 'default'}
-        />
-        <MetricCard
-          title="Total Commands"
-          value={formatNumber(overview?.total_commands ?? 0)}
-          description="Commands executed"
-          icon={Terminal}
-        />
-        <MetricCard
-          title="Avg Session Duration"
-          value={overview ? formatDuration(overview.avg_session_duration) : '0s'}
-          description="Average session length"
-          icon={Clock}
-        />
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Timeline Chart */}
-        <MetricsChart
-          title="Activity Timeline (24h)"
-          data={timeline?.points ?? []}
-          type="line"
-          height={300}
-        />
-
-        {/* Tool Usage */}
-        <ToolUsageChart
-          title="Top Tools Usage"
-          data={overview?.top_tools ?? []}
-        />
-      </div>
-
-      {/* Recent Activity */}
-      {timeline && timeline.points.length > 0 && (
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Timeline Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Points:</span>
-                <span className="font-medium">{timeline.summary.total_points}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Average:</span>
-                <span className="font-medium">{timeline.summary.avg_value.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Min Value:</span>
-                <span className="font-medium">{timeline.summary.min_value.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Max Value:</span>
-                <span className="font-medium">{timeline.summary.max_value.toFixed(2)}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Recent Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {overview?.recent_activity.slice(0, 5).map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 rounded border">
-                    <div>
-                      <span className="font-medium">{activity.name}</span>
-                      {Object.keys(activity.labels).length > 0 && (
-                        <div className="text-xs text-muted-foreground">
-                          {Object.entries(activity.labels).map(([key, value]) => (
-                            <span key={key} className="mr-2">{key}={value}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="font-medium">{activity.value}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(activity.timestamp).toLocaleTimeString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex items-center gap-3">
+          <TimeRangeSelector 
+            value={timeRange} 
+            onChange={setTimeRange}
+            disabled={isLoading}
+          />
+          <Button 
+            onClick={handleRefreshAll} 
+            variant="outline" 
+            size="sm"
+            disabled={isLoading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/analytics">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Advanced Analytics
+            </Link>
+          </Button>
         </div>
-      )}
+      </div>
 
-      {/* Sessions Table */}
-      {sessions && (
-        <SessionsTable
-          sessions={sessions.sessions}
-          title="Recent Sessions"
+      {/* KPI Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <KPICard
+          title="Today's Sessions"
+          value={kpis.data?.today_sessions ?? 0}
+          change={kpis.data?.today_sessions_change}
+          changeLabel="from yesterday"
+          icon={<Users className="h-4 w-4" />}
+          loading={kpis.loading}
         />
-      )}
+        <KPICard
+          title="Token Usage"
+          value={kpis.data?.total_tokens ?? 0}
+          change={kpis.data?.total_tokens_change}
+          changeLabel="from previous period"
+          icon={<Activity className="h-4 w-4" />}
+          loading={kpis.loading}
+        />
+        <KPICard
+          title="Total Cost"
+          value={kpis.data ? `$${kpis.data.total_cost.toFixed(2)}` : '$0.00'}
+          change={kpis.data?.total_cost_change}
+          changeLabel="from previous period"
+          icon={<DollarSign className="h-4 w-4" />}
+          loading={kpis.loading}
+        />
+        <KPICard
+          title="Lines of Code"
+          value={kpis.data?.lines_of_code ?? 0}
+          change={kpis.data?.lines_of_code_change}
+          changeLabel="from previous period"
+          icon={<Code2 className="h-4 w-4" />}
+          loading={kpis.loading}
+        />
+      </div>
 
-      {/* Loading State */}
-      {loading && !overview && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-              <span>Loading dashboard data...</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Main Charts Row */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TokenTrendChart
+            data={tokenTrend.data?.data_points ?? []}
+            range={timeRange}
+            loading={tokenTrend.loading}
+          />
+        </div>
+        <div className="lg:col-span-1">
+          <CostProgressRing
+            data={budgetProgress.data ?? {
+              current_month_cost: 0,
+              monthly_budget: 500,
+              percentage_used: 0,
+              days_remaining: 15,
+              projected_month_end_cost: 0,
+              is_over_budget: false,
+              daily_breakdown: []
+            }}
+            loading={budgetProgress.loading}
+          />
+        </div>
+      </div>
+
+      {/* Secondary Charts Row */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ToolUsagePie
+          data={toolUsage.data ?? { total_tool_calls: 0, tools: [] }}
+          loading={toolUsage.loading}
+        />
+        <UsageHeatmap
+          data={heatmap.data ?? { timezone: 'UTC', heatmap: [] }}
+          loading={heatmap.loading}
+        />
+      </div>
+
+      {/* Footer */}
+      <div className="text-center text-sm text-muted-foreground">
+        <p>
+          Data refreshes automatically every 30 seconds. 
+          <Button 
+            variant="link" 
+            size="sm" 
+            className="px-1 h-auto font-normal"
+            asChild
+          >
+            <Link href="/analytics">
+              View detailed analytics →
+            </Link>
+          </Button>
+        </p>
+      </div>
     </div>
   )
 }
