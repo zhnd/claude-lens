@@ -1,0 +1,10 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "database": "${workspaceFolder:claude-scope}/claude-scope.db",
+      "name": "claude scope dev"
+    }
+  ]
+}

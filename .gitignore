@@ -1,0 +1,6 @@
+# Build script demo
+/target/
+web/node_modules/
+web/dist/
+web/.build_cache
+*.db
