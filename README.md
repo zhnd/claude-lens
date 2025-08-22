@@ -1,4 +1,4 @@
-# Claude Scope
+# Claude Lens
 
 A monitoring tool for Claude Code that receives OpenTelemetry data and provides a web interface for analysis.
 
@@ -13,17 +13,17 @@ A monitoring tool for Claude Code that receives OpenTelemetry data and provides 
 
 ```bash
 # Start with default settings
-claude-scope
+claude-lens
 
 # Custom configuration
-claude-scope --port 8080 --otel-port 4317 --db-path ./data.db
+claude-lens --port 8080 --otel-port 4317 --db-path ./data.db
 ```
 
 ## Command Line Options
 
 - `--port <PORT>`: HTTP server port (default: 3000)
 - `--otel-port <PORT>`: OpenTelemetry gRPC server port (default: 4317) 
-- `--db-path <PATH>`: SQLite database path (default: ./claude-scope.db)
+- `--db-path <PATH>`: SQLite database path (default: ./claude-lens.db)
 
 ## Building
 
@@ -36,7 +36,7 @@ cargo build --release
 The project structure:
 
 ```
-claude-scope/
+claude-lens/
 ├── src/
 │   ├── main.rs          # Entry point and CLI
 │   ├── server.rs        # HTTP server setup

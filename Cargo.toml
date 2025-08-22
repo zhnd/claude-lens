@@ -1,8 +1,8 @@
 [package]
-name = "claude-scope"
+name = "claude-lens"
 version = "0.1.0"
 edition = "2021"
-description = "Claude Code monitoring tool with OpenTelemetry data collection and web interface"
+description = "Claude Code analytics and monitoring tool with comprehensive insights dashboard"
 authors = ["Claude"]
 license = "MIT"
 
@@ -33,5 +33,5 @@ toml = "0.8"
 tonic-build = "0.10"
 
 [[bin]]
-name = "claude-scope"
+name = "claude-lens"
 path = "src/main.rs"

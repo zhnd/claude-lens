@@ -1,8 +1,8 @@
-# Claude Scope 构建指南
+# Claude Lens 构建指南
 
 ## 自动化前端构建
 
-Claude Scope 使用 `build.rs` 脚本实现自动化前端构建集成。
+Claude Lens 使用 `build.rs` 脚本实现自动化前端构建集成。
 
 ### 功能特性
 

@@ -34,7 +34,7 @@ export function Navigation() {
             <div className="flex flex-shrink-0 items-center">
               <Link href="/" className="flex items-center space-x-2">
                 <Activity className="h-8 w-8 text-primary" />
-                <span className="hidden font-bold text-xl sm:block">Claude Scope</span>
+                <span className="hidden font-bold text-xl sm:block">Claude Lens</span>
               </Link>
             </div>
             
@@ -72,7 +72,7 @@ export function Navigation() {
             {/* GitHub link */}
             <Button variant="ghost" size="sm" asChild>
               <a 
-                href="https://github.com/zhnd/claude-scope" 
+                href="https://github.com/zhnd/claude-lens" 
                 target="_blank" 
                 rel="noopener noreferrer"
               >
@@ -136,7 +136,7 @@ export function Navigation() {
             
             <div className="border-t pt-3 mt-3">
               <a
-                href="https://github.com/zhnd/claude-scope"
+                href="https://github.com/zhnd/claude-lens"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/50 hover:text-foreground transition-colors"

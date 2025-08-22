@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Claude Scope is a monitoring tool for Claude Code that collects OpenTelemetry data via gRPC and provides a Next.js-based web dashboard. The project uses a Rust backend with an integrated frontend build system.
+Claude Lens is a monitoring tool for Claude Code that collects OpenTelemetry data via gRPC and provides a Next.js-based web dashboard. The project uses a Rust backend with an integrated frontend build system.
 
 ## Development Commands
 
@@ -134,7 +134,7 @@ All REST endpoints follow a consistent pattern:
 
 Configuration hierarchy (highest priority first):
 1. CLI arguments (`--port`, `--otel-port`, `--db-path`)
-2. Environment variables (`CLAUDE_SCOPE_HTTP_PORT`, `CLAUDE_SCOPE_OTEL_PORT`, etc.)
+2. Environment variables (`CLAUDE_LENS_HTTP_PORT`, `CLAUDE_LENS_OTEL_PORT`, etc.)
 3. Default values
 
 ### Static Asset Serving

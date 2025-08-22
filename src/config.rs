@@ -16,7 +16,7 @@ impl Default for Config {
         Self {
             http_port: 3000,
             otel_port: 4317,
-            database_path: "./claude-scope.db".to_string(),
+            database_path: "./claude-lens.db".to_string(),
             cors_origins: vec![
                 "http://localhost:3000".to_string(),
                 "http://127.0.0.1:3000".to_string(),
@@ -32,34 +32,34 @@ impl Config {
     pub fn from_env() -> Self {
         let mut config = Self::default();
 
-        if let Ok(port) = env::var("CLAUDE_SCOPE_HTTP_PORT") {
+        if let Ok(port) = env::var("CLAUDE_LENS_HTTP_PORT") {
             if let Ok(port) = port.parse() {
                 config.http_port = port;
             }
         }
 
-        if let Ok(port) = env::var("CLAUDE_SCOPE_OTEL_PORT") {
+        if let Ok(port) = env::var("CLAUDE_LENS_OTEL_PORT") {
             if let Ok(port) = port.parse() {
                 config.otel_port = port;
             }
         }
 
-        if let Ok(path) = env::var("CLAUDE_SCOPE_DATABASE_PATH") {
+        if let Ok(path) = env::var("CLAUDE_LENS_DATABASE_PATH") {
             config.database_path = path;
         }
 
-        if let Ok(origins) = env::var("CLAUDE_SCOPE_CORS_ORIGINS") {
+        if let Ok(origins) = env::var("CLAUDE_LENS_CORS_ORIGINS") {
             config.cors_origins = origins
                 .split(',')
                 .map(|s| s.trim().to_string())
                 .collect();
         }
 
-        if let Ok(level) = env::var("CLAUDE_SCOPE_LOG_LEVEL") {
+        if let Ok(level) = env::var("CLAUDE_LENS_LOG_LEVEL") {
             config.log_level = level;
         }
 
-        if let Ok(max_conn) = env::var("CLAUDE_SCOPE_MAX_CONNECTIONS") {
+        if let Ok(max_conn) = env::var("CLAUDE_LENS_MAX_CONNECTIONS") {
             if let Ok(max_conn) = max_conn.parse() {
                 config.max_connections = max_conn;
             }

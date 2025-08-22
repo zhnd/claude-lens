@@ -14,7 +14,7 @@ export function TimeRangeProvider({ children }: { children: ReactNode }) {
 
   // Persist to localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('claude-scope-time-range');
+    const saved = localStorage.getItem('claude-lens-time-range');
     if (saved) {
       setTimeRangeState(saved);
     }
@@ -22,7 +22,7 @@ export function TimeRangeProvider({ children }: { children: ReactNode }) {
 
   const setTimeRange = (range: string) => {
     setTimeRangeState(range);
-    localStorage.setItem('claude-scope-time-range', range);
+    localStorage.setItem('claude-lens-time-range', range);
   };
 
   return React.createElement(

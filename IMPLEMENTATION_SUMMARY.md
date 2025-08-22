@@ -1,4 +1,4 @@
-# Claude Scope - Datadog-Style Monitoring Implementation
+# Claude Lens - Datadog-Style Monitoring Implementation
 
 ## Overview
 

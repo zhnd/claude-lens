@@ -5,7 +5,7 @@ import { Navigation } from '@/components/dashboard/navigation'
 import { ErrorBoundary } from '@/components/dashboard/error-boundary'
 
 export const metadata: Metadata = {
-  title: 'Claude Scope - Monitoring Dashboard',
+  title: 'Claude Lens - Monitoring Dashboard',
   description: 'Claude Code monitoring tool with OpenTelemetry data collection',
 }
 
